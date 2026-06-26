@@ -2,7 +2,6 @@
 💼 I’m currently an Analytics Intern @ Bell Techlogix<br>🎓 Incoming Master of Science in Applied Data Science @ Indiana University Indianapolis
 
 # 💻 Tech Stack:
-### Languages
 ![Python](https://img.shields.io/badge/python-3670A0?style=flat&logo=python&logoColor=ffdd54)
 ![SQL](https://img.shields.io/badge/SQL-4479A1?style=flat&logo=postgresql&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
