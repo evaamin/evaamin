@@ -37,6 +37,13 @@
 ![](https://github-readme-stats.vercel.app/api/top-langs/?username=evaamin&theme=dark&hide_border=false&include_all_commits=true&count_private=true&layout=compact)
 
 <!--
+# 📊 Kaggle Stats:
+![competition](https://road-to-kaggle-grandmaster.vercel.app/api/badges/evanka1/competition/dark)
+![dataset](https://road-to-kaggle-grandmaster.vercel.app/api/badges/evanka1/dataset/dark)
+![notebook](https://road-to-kaggle-grandmaster.vercel.app/api/badges/evanka1/notebook/dark)
+![discussion](https://road-to-kaggle-grandmaster.vercel.app/api/badges/evanka1/discussion/dark)
+
+
 **evaamin/evaamin** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
 Here are some ideas to get you started:
