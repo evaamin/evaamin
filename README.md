@@ -1,5 +1,5 @@
 # About Me:
-💼 I’m currently an Analytics Intern @ Bell Techlogix<br>🎓 Incoming Master of Science in Applied Data Science @ Indiana University Indianapolis
+💼 Interested in data engineering and AI engineering<br>🎓 Incoming Master of Science in Applied Data Science @ Indiana University Indianapolis
 
 # 💻 Tech Stack:
 ![Python](https://img.shields.io/badge/python-3670A0?style=flat&logo=python&logoColor=ffdd54)
