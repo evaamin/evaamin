@@ -10,9 +10,16 @@ this script is inherently a scraper: it can break if Kaggle changes their
 frontend. If it does, run with --debug to dump the raw JSON blobs found on
 the page so the parsing logic can be adjusted.
 
+Kaggle also serves a reCAPTCHA challenge page instead of real profile HTML to
+plain unauthenticated requests, which --debug will surface as zero JSON blobs
+found. Use --cookie-file to send a real logged-in session's Cookie header,
+which is much less likely to get challenged. See SETUP.md for how to capture
+one from your browser.
+
 Usage:
     python fetch_and_render.py --username evanka1 --out kaggle-badges.svg
     python fetch_and_render.py --username evanka1 --out kaggle-badges.svg --debug
+    python fetch_and_render.py --username evanka1 --out kaggle-badges.svg --cookie-file kaggle_cookie.txt
 """
 
 import argparse
@@ -32,9 +39,12 @@ USER_AGENT = (
 BADGE_KEY_CANDIDATES = ("badges", "achievements", "userAchievements", "earnedBadges")
 
 
-def fetch_html(username: str) -> str:
+def fetch_html(username: str, cookie: str = "") -> str:
     url = PROFILE_URL_TMPL.format(username=username)
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    headers = {"User-Agent": USER_AGENT}
+    if cookie:
+        headers["Cookie"] = cookie
+    req = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(req, timeout=30) as resp:
         return resp.read().decode("utf-8", errors="replace")
 
@@ -229,9 +239,24 @@ def main():
     ap.add_argument("--out", default="kaggle-badges.svg")
     ap.add_argument("--theme", default="dark", choices=["dark", "light"])
     ap.add_argument("--debug", action="store_true", help="Dump raw JSON blobs and exit")
+    ap.add_argument(
+        "--cookie-file",
+        help=(
+            "Path to a file containing a raw Kaggle 'Cookie' header value from a "
+            "logged-in browser session. Kaggle's anonymous-request bot detection "
+            "(reCAPTCHA challenge page) blocks plain scraping; a real session "
+            "cookie is much more likely to get through. See SETUP.md for how to "
+            "capture one."
+        ),
+    )
     args = ap.parse_args()
 
-    html = fetch_html(args.username)
+    cookie = ""
+    if args.cookie_file:
+        with open(args.cookie_file) as f:
+            cookie = f.read().strip()
+
+    html = fetch_html(args.username, cookie=cookie)
     blobs = extract_json_blobs(html)
 
     if args.debug:

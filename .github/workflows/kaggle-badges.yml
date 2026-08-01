@@ -1,10 +1,12 @@
 name: Update Kaggle badges
 
 on:
-  schedule:
-    # Runs once a day at 09:00 UTC. Adjust as you like.
-    - cron: "0 9 * * *"
-  workflow_dispatch: {}  # lets you trigger it manually from the Actions tab
+  # No schedule: Kaggle serves a reCAPTCHA challenge page to unauthenticated
+  # requests, including from GitHub-hosted runners, so a scheduled run would
+  # just fail daily. Badge regeneration is done locally instead (with a real
+  # logged-in session's cookie — see SETUP.md) and the resulting SVG pushed
+  # here manually. Kept as workflow_dispatch in case that changes.
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -21,28 +23,21 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Debug fetch
+      - name: Fetch badges and render SVG
         run: |
           python scripts/fetch_and_render.py \
             --username evanka1 \
             --out kaggle-badges.svg \
-            --theme dark \
-            --debug
+            --theme dark
 
-      - name: Upload debug output
-        uses: actions/upload-artifact@v4
-        with:
-          name: kaggle-debug-blobs
-          path: kaggle_debug_blobs.json
-
-      # - name: Commit changes if anything updated
-      #   run: |
-      #     git config user.name "github-actions[bot]"
-      #     git config user.email "github-actions[bot]@users.noreply.github.com"
-      #     git add kaggle-badges.svg
-      #     if git diff --cached --quiet; then
-      #       echo "No changes to commit."
-      #     else
-      #       git commit -m "Auto-update Kaggle badges"
-      #       git push
-      #     fi
+      - name: Commit changes if anything updated
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add kaggle-badges.svg
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Auto-update Kaggle badges"
+            git push
+          fi
