@@ -24,6 +24,25 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Debug fetch (diagnostic)
+        env:
+          KAGGLE_COOKIE: ${{ secrets.KAGGLE_COOKIE }}
+        run: |
+          echo "$KAGGLE_COOKIE" > kaggle_cookie.txt
+          python scripts/fetch_and_render.py \
+            --username evanka1 \
+            --out kaggle-badges.svg \
+            --theme dark \
+            --cookie-file kaggle_cookie.txt \
+            --debug
+          rm -f kaggle_cookie.txt
+
+      - name: Upload debug output
+        uses: actions/upload-artifact@v4
+        with:
+          name: kaggle-debug-blobs
+          path: kaggle_debug_blobs.json
+
       - name: Fetch badges and render SVG
         env:
           KAGGLE_COOKIE: ${{ secrets.KAGGLE_COOKIE }}
