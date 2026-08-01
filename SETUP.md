@@ -26,11 +26,19 @@ kaggle-profile-card) rely on. That means:
   `--debug` will show up as zero JSON blobs found. There's no official API
   to fall back on, so the fix is to send a real logged-in session's cookie
   (see below), not an automated CAPTCHA bypass.
-- Because of that, this no longer runs on a daily schedule. The workflow is
-  `workflow_dispatch`-only (manual trigger from the Actions tab), and the
-  normal path is to regenerate the SVG **locally** with a cookie and push it
-  yourself, since GitHub-hosted runners have no session to authenticate
-  with and would just hit the same challenge page.
+- Because of that, this no longer runs on a daily schedule. The workflow
+  reads the cookie from a `KAGGLE_COOKIE` repo secret and is
+  `workflow_dispatch`-only until a manual run confirms it actually finds
+  badges from a GitHub-hosted runner's IP (not guaranteed even with a valid
+  cookie — Kaggle's bot check may weigh IP reputation too). You can also
+  regenerate the SVG **locally** with the same cookie instead of relying on
+  CI — see below.
+
+  Storing a live Kaggle session cookie as a repo secret means anyone who can
+  push workflow changes to this repo (or get a workflow-modifying PR
+  merged) can exfiltrate it. Keep write access to this repo scoped to
+  people you trust, and expect to rotate the secret whenever the session
+  expires.
 
 ## Regenerating the badges locally
 
@@ -66,12 +74,14 @@ it's equivalent to your logged-in Kaggle session.
 4. In your repo settings: **Settings → Actions → General → Workflow
    permissions → Read and write permissions**. This lets the Action commit
    the updated SVG back to the repo.
-5. Commit and push.
-6. The `update-badges` workflow itself is `workflow_dispatch`-only now — it
-   has no cookie to authenticate with, so running it from the Actions tab
-   will just hit the same reCAPTCHA wall as an unauthenticated local run.
-   Follow "Regenerating the badges locally" above instead to actually
-   produce `kaggle-badges.svg`, then commit and push it the normal way.
+5. Add your session cookie as a repo secret named `KAGGLE_COOKIE`
+   (**Settings → Secrets and variables → Actions → New repository secret**)
+   — see step 2 under "Regenerating the badges locally" for how to capture
+   the cookie value.
+6. Commit and push. Then go to the **Actions** tab, select "Update Kaggle
+   badges," and click **Run workflow** to trigger it manually and confirm
+   it actually finds badges (rather than hitting the reCAPTCHA wall) before
+   considering a schedule trigger.
 
 ## If a run finds zero badges
 

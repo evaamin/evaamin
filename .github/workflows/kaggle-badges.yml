@@ -1,11 +1,12 @@
 name: Update Kaggle badges
 
 on:
-  # No schedule: Kaggle serves a reCAPTCHA challenge page to unauthenticated
-  # requests, including from GitHub-hosted runners, so a scheduled run would
-  # just fail daily. Badge regeneration is done locally instead (with a real
-  # logged-in session's cookie — see SETUP.md) and the resulting SVG pushed
-  # here manually. Kept as workflow_dispatch in case that changes.
+  # Manual trigger only for now. This authenticates with the KAGGLE_COOKIE
+  # repo secret, but a valid cookie run from a GitHub-hosted runner's
+  # datacenter IP still isn't guaranteed to dodge Kaggle's reCAPTCHA check
+  # the way it does from a residential IP. Verify a manual run actually
+  # finds badges before switching this back to a `schedule:` trigger —
+  # otherwise it'll fail silently once a day instead of just once.
   workflow_dispatch: {}
 
 permissions:
@@ -24,11 +25,16 @@ jobs:
           python-version: "3.11"
 
       - name: Fetch badges and render SVG
+        env:
+          KAGGLE_COOKIE: ${{ secrets.KAGGLE_COOKIE }}
         run: |
+          echo "$KAGGLE_COOKIE" > kaggle_cookie.txt
           python scripts/fetch_and_render.py \
             --username evanka1 \
             --out kaggle-badges.svg \
-            --theme dark
+            --theme dark \
+            --cookie-file kaggle_cookie.txt
+          rm -f kaggle_cookie.txt
 
       - name: Commit changes if anything updated
         run: |
